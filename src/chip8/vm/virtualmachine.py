@@ -3,12 +3,12 @@ from threading import Event
 from .virtualmachine_abc import VirtualMachineABC
 from .timer import Timer
 from .screen import Screen
+from .keyboard import Keystate, Keyboard, KEYBOARD_SIZE
 
 
 class VirtualMachine(VirtualMachineABC):
     MEMORY_LOCATIONS = 4096
     NUM_DATA_REGISTER = 16
-    NUM_KEYS = 16
     SCREEN_WIDTH = 64
     SCREEN_HEIGHT = 32
     PROGRAM_START = 0x200
@@ -23,7 +23,7 @@ class VirtualMachine(VirtualMachineABC):
         self._stack: list[int] = []
         self._delay_timer = Timer()
         self._sound_timer = Timer()
-        self._keystate = [False] * self.NUM_KEYS
+        self._keyboard = Keyboard()
         self._screen = Screen(self.SCREEN_WIDTH, self.SCREEN_HEIGHT)
         self._sound_event = Event()
 
@@ -39,3 +39,6 @@ class VirtualMachine(VirtualMachineABC):
             )
 
         self._memory[self.PROGRAM_START : self.PROGRAM_START + rom_size] = rom_array
+
+    def set_keystate(self, keystate: Keystate):
+        self._keyboard.keystate = keystate

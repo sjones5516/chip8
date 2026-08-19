@@ -18,9 +18,9 @@ class Keyboard:
     @property
     def keystate(self) -> Keystate:
         with self._lock:
-            return self._keyboard
+            return self._keystate
 
     @keystate.setter
     def keystate(self, value: Keystate):
         with self._lock:
-            self._keyboard = value
+            self._keystate = value
