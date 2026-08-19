@@ -1,0 +1,22 @@
+---
+title: Sequence Diagram
+---
+sequenceDiagram
+    participant User
+    participant View 
+    participant Controller
+    participant VM
+
+    VM ->> VM: Init VM
+    User ->> View: Select ROM
+    View ->> Controller: Send ROM filepath
+    Controller ->> VM: Send ROM file data
+
+    loop Emulator Cycle
+        User ->> View: May press keys
+        View ->> Controller: Update keystate
+        Controller ->> VM: View send keystate
+        VM ->> VM: VM cycle
+        VM ->> Controller: Send graphics and sound data
+        Controller ->> View: Update view
+    end
