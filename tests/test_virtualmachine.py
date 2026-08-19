@@ -38,3 +38,13 @@ def test_load_rom_raises_when_rom_does_not_fit():
 
     with pytest.raises(MemoryError):
         vm.load_rom(rom)
+
+
+def test_fetch_returns_next_opcode_and_advances_program_counter():
+    vm = VirtualMachine()
+    vm.load_rom(b"\x12\x34")
+
+    opcode = vm._fetch()
+
+    assert opcode == bytearray(b"\x12\x34")
+    assert vm._program_counter == VirtualMachine.PROGRAM_START + 2

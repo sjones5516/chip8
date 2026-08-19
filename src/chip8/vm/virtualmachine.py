@@ -26,6 +26,7 @@ class VirtualMachine(VirtualMachineABC):
         self._keyboard = Keyboard()
         self._screen = Screen(self.SCREEN_WIDTH, self.SCREEN_HEIGHT)
         self._sound_event = Event()
+        self._program_counter = self.PROGRAM_START
 
     def _can_fit_into_memory(self, data_size: int) -> bool:
         return data_size <= self.AVAILABLE_ROM_LOCATIONS
@@ -42,3 +43,8 @@ class VirtualMachine(VirtualMachineABC):
 
     def set_keystate(self, keystate: Keystate):
         self._keyboard.keystate = keystate
+
+    def _fetch(self) -> bytearray:
+        opcode = self._memory[self._program_counter : self._program_counter + 2]
+        self._program_counter += 2
+        return opcode
