@@ -1,6 +1,6 @@
 from enum import Enum
 from dataclasses import dataclass
-from typing import Optional
+from typing import Any, Optional
 
 
 class Opcode(Enum):
@@ -76,11 +76,48 @@ class Opcode(Enum):
 
 @dataclass
 class Instruction:
-    """Represents an instruction, including opcode and optional fields"""
+    """Represents an 2B instruction, including opcode and optional fields"""
 
     opcode: Opcode
-    NNN: Optional[int]
-    NN: Optional[int]
-    N: Optional[int]
-    X: Optional[int]
-    Y = Optional[int]
+    NNN: int
+    """Always 12 least significant bits. Address"""
+    NN: int
+    """Always 8 least significant bits. 8-bit constant"""
+    N: int
+    """Always 4 least significant bits. 4-bit constant"""
+    X: int
+    """Always the 2nd least significant nibble. First register identifier"""
+    Y: int
+    """Always the 3rd least significant nibble. Second register identifier"""
+
+    @staticmethod
+    def _extract_opcode(data: int) -> Opcode:
+        for opcode in Opcode:
+            opcode_name = opcode.name[3:]
+            if opcode_name in {"00E0", "00EE"}:
+                mask = 0xFFFF
+            elif opcode_name[0] in {"1", "2", "3", "4", "6", "7", "A", "B", "C", "D"}:
+                mask = 0xF000
+            elif opcode_name[0] in {"5", "8", "9"}:
+                mask = 0xF00F
+            else:
+                mask = 0xF0FF
+
+            if data & mask == opcode.value:
+                return opcode
+
+        raise ValueError(f"Unknown opcode: 0x{data:04X}")
+
+    def __init__(self, value: bytes):
+        data_size = len(value)
+        if data_size != 2:
+            raise ValueError(
+                f"Cannot parse {value} as opcode. Expected 2B, got {data_size}"
+            )
+        data = int.from_bytes(value, "big")
+        self.opcode = self._extract_opcode(data)
+        self.NNN = data & 0xFFF
+        self.NN = data & 0xFF
+        self.N = data & 0xF
+        self.X = (data >> 8) & 0xF
+        self.Y = (data >> 4) & 0xF
