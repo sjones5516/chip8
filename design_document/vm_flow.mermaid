@@ -1,0 +1,24 @@
+---
+title: VM Flow
+---
+
+stateDiagram-v2
+    selectROM: Select a ROM
+    loadROM: Load ROM into memory
+    getKeystate: Get keystate
+    readMemory: Read 2B of memory
+    decodeOpcode: Decode Opcode
+    executeOpcode: Execute Opcode
+    updateSound: Update sound property
+    state isHalted <<choice>>
+
+    [*] --> selectROM
+    selectROM --> loadROM
+    loadROM --> readMemory 
+    readMemory --> decodeOpcode
+    decodeOpcode --> executeOpcode
+    executeOpcode --> updateSound 
+    updateSound --> getKeystate
+    getKeystate --> isHalted
+    isHalted --> updateSound : Halted 
+    isHalted --> readMemory : Not halted
