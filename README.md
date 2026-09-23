@@ -1,4 +1,5 @@
 # chip8
+This project is currently in hiatus.
 
 This is a toy CHIP-8 interpreter for Python3.
 
